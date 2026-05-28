@@ -17,7 +17,6 @@ class DetailText {
   static const TextStyle title = TextStyle(
     fontSize: 20,
     fontWeight: FontWeight.bold,
-    color: Colors.black,
     letterSpacing: 1.5,
   );
   static const TextStyle titlejp = TextStyle(
@@ -29,6 +28,5 @@ class DetailText {
   static const TextStyle description = TextStyle(
     fontSize: 14,
     height: 1.5,
-    color: Colors.black87,
   );
 }

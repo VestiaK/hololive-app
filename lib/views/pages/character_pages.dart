@@ -1,3 +1,4 @@
+import 'package:first/data/notifiers.dart';
 import 'package:first/views/widget/profileDetail_widget.dart';
 import 'package:first/views/widget/profileHeader_widget.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +10,7 @@ class CharacterPages extends StatelessWidget {
   final String description;
   final String image;
   final String headerBg;
-  final String highlightIamge;
+  final String highlightImage;
   final List<String> avatar;
 
   const CharacterPages({
@@ -20,7 +21,7 @@ class CharacterPages extends StatelessWidget {
     required this.image,
     required this.description,
     required this.headerBg,
-    required this.highlightIamge,
+    required this.highlightImage,
     required this.avatar,
   });
 
@@ -28,25 +29,30 @@ class CharacterPages extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        child: Container(
-          color: Color(0xFF61AAD8),
-          child: Column(
-            children: [
-              ProfileheaderWidget(
-                name: name,
-                headerBg: headerBg,
-                highlightIamge: highlightIamge,
-                avatar: avatar,
+        child: ValueListenableBuilder(
+          valueListenable: darkmode,
+          builder: (context, dark, child) {
+            return Container(
+              color: dark ? Color(0xFF61AAD8) :Color(0xFF121A2A),
+              child: Column(
+                children: [
+                  ProfileheaderWidget(
+                    name: name,
+                    headerBg: headerBg,
+                    highlightImage: highlightImage,
+                    avatar: avatar,
+                  ),
+                  ProfileDetailWidget(
+                    name: name,
+                    namejp: namejp,
+                    jiko: jiko,
+                    description: description,
+                    image: image,
+                  ),
+                ],
               ),
-              ProfileDetailWidget(
-                name: name,
-                namejp: namejp,
-                jiko: jiko,
-                description: description,
-                image: image,
-              ),
-            ],
-          ),
+            );
+          }
         ),
       ),
     );

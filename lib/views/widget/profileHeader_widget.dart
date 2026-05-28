@@ -1,17 +1,18 @@
 import 'package:first/data/constants.dart';
+import 'package:first/data/notifiers.dart';
 import 'package:flutter/material.dart';
 
 class ProfileheaderWidget extends StatelessWidget {
   final String name;
   final String headerBg;
-  final String highlightIamge;
+  final String highlightImage;
   final List<String> avatar;
 
   const ProfileheaderWidget({
     super.key,
     required this.name,
     required this.headerBg,
-    required this.highlightIamge,
+    required this.highlightImage,
     required this.avatar,
   });
 
@@ -24,7 +25,12 @@ class ProfileheaderWidget extends StatelessWidget {
             bottomLeft: Radius.circular(50),
             bottomRight: Radius.circular(50),
           ),
-          child: Image.asset(headerBg),
+          child: ValueListenableBuilder(
+            valueListenable: darkmode,
+            builder: (context, dark, child) {
+              return Image.asset(headerBg, color: dark ? null :Colors.black.withValues(alpha: 0.6),colorBlendMode: BlendMode.darken);
+            }
+          ),
         ),
         Padding(
           padding: const EdgeInsets.only(left: 10, top: 10),
@@ -44,8 +50,7 @@ class ProfileheaderWidget extends StatelessWidget {
               ),
             ),
             Center(
-              child: Image.network(
-                'https://hololive.hololivepro.com/wp-content/uploads/2020/07/Kobo-Kanaeru_pr-img_01.webp',
+              child: Image.network(highlightImage,
                 height: 400,
               ),
             ),
@@ -57,12 +62,17 @@ class ProfileheaderWidget extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                       horizontal: 5.0,
                     ), 
-                    child: CircleAvatar(
-                      radius: 40,
-                      backgroundColor: Colors.white,
-                      backgroundImage: AssetImage(
-                        imagePath,
-                      ), 
+                    child: ValueListenableBuilder(
+                      valueListenable: darkmode,
+                      builder: (context, dark, child) {
+                        return CircleAvatar(
+                          radius: 40,
+                          backgroundColor: dark ? Colors.white : const Color(0xFF1F2431),
+                          backgroundImage: AssetImage(
+                            imagePath,
+                          ), 
+                        );
+                      }
                     ),
                   );
                 },

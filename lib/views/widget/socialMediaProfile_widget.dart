@@ -1,3 +1,4 @@
+import 'package:first/data/notifiers.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -26,10 +27,18 @@ class SocialMediaProfile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton.icon(
-      onPressed: _launchURL,
-      icon: FaIcon(icon, color: iconColor),
-      label: Text(label, style: const TextStyle(color: Colors.black87)),
+    return ValueListenableBuilder(
+      valueListenable: darkmode,
+      builder: (context, dark, child) {
+        return ElevatedButton.icon(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: dark ? Colors.white : const Color(0xFF1F2431),
+          ),
+          onPressed: _launchURL,
+          icon: FaIcon(icon, color: iconColor),
+          label: Text(label, style: TextStyle(color: dark ?  Colors.black87 : Colors.white)),
+        );
+      }
     );
   }
 }
