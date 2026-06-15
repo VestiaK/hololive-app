@@ -1,5 +1,4 @@
-
-import 'package:first/views/widget_tree.dart';
+import 'package:first/views/pages/login_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
@@ -18,6 +17,13 @@ class WelcomePages extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Lottie.asset('lotties/c.json'),
+              FittedBox(
+                child: Text(
+                  'Welcome to the app!',
+                  style: TextStyle(fontSize: 100, fontWeight: FontWeight.bold, letterSpacing: 30.0),
+                ),
+              ),
+              SizedBox(height: 10),
               FilledButton(
                 onPressed: () {
                   selectedPage.value = 0;
@@ -31,12 +37,40 @@ class WelcomePages extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) {
-                        return WidgetTree();
+                        return LoginPages();
                       },
                     ),
                   );
                 },
-                child: Text('login'),
+                style: FilledButton.styleFrom(
+                  minimumSize: Size(double.infinity, 50),
+                ),
+                child: Text('Login'),
+              ),
+
+              SizedBox(height: 10),
+              TextButton(
+                onPressed: () {
+                  selectedPage.value = 0;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Login'),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return LoginPages();
+                      },
+                    ),
+                  );
+                },
+                style: FilledButton.styleFrom(
+                  minimumSize: Size(double.infinity, 50),
+                ),
+                child: Text('Register'),
               ),
             ],
           ),
