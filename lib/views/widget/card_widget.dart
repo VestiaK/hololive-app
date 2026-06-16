@@ -1,30 +1,27 @@
-import 'package:first/data/constants.dart';
 import 'package:flutter/material.dart';
+// 1. Pastikan import holodex ada di sini
+import 'package:dart_holodex_api/dart_holodex_api.dart'; 
 
 class CardWidget extends StatelessWidget {
+  // 2. PASTIKAN tipe datanya adalah VideoFull, BUKAN Video
+  final VideoFull video; 
 
-  final String title;
-  final String description;
-  final String image;
-  final VoidCallback onTap;
-
-  const CardWidget({super.key, required this.title, required this.description, required this.image, required this.onTap});
+  const CardWidget({Key? key, required this.video}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.network(image, height: 100, ),
-            SizedBox(height: 5,),
-            Text(title, style: KtextStyle.titleCard),
-            Text(description, style: KtextStyle.deCard),
-          ],
-        ),
+      child: Column(
+        children: [
+          Image.network(
+            'https://i.ytimg.com/vi/${video.id}/hqdefault.jpg',
+            fit: BoxFit.cover,
+          ),
+          ListTile(
+            title: Text(video.title ?? 'No Title'),
+            subtitle: Text(video.channel?.name ?? 'Unknown Channel'),
+          ),
+        ],
       ),
     );
   }

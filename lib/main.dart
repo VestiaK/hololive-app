@@ -1,8 +1,17 @@
 import 'package:first/data/notifiers.dart';
 import 'package:first/views/pages/welcome_pages.dart';
 import 'package:flutter/material.dart';
+// 1. Tambahkan import dotenv di sini
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+// 2. Ubah void main() menjadi Future<void> main() async
+Future<void> main() async {
+  // 3. Wajib tambahkan ini agar engine Flutter siap
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // 4. Perintah untuk me-load file .env sebelum aplikasi berjalan
+  await dotenv.load(fileName: "assets/.env");
+
   runApp(const Home());
 }
 
