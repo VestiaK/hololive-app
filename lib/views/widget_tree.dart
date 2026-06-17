@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'package:first/views/pages/profile_pages.dart';
 
-List<Widget> pages = [MyHome(), MyProfile()];
+List<Widget> pages = [MyHome(), ProfilePages()];
 
 class WidgetTree extends StatelessWidget {
   const WidgetTree({super.key});

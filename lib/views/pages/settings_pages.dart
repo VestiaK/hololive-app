@@ -18,7 +18,7 @@ class _SettingsState extends State<Settings> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
-        //opsional klo mau back kemana 
+
         leading: BackButton(
           onPressed: () {
             Navigator.pop(context);

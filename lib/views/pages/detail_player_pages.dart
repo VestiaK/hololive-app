@@ -1,3 +1,4 @@
+import 'package:first/views/pages/channel_detail_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:dart_holodex_api/dart_holodex_api.dart';
 import 'package:url_launcher/url_launcher.dart'; 
@@ -7,7 +8,6 @@ class DetailPlayerPage extends StatelessWidget {
 
   const DetailPlayerPage({Key? key, required this.video}) : super(key: key);
 
-  // Fungsi untuk membuka link langsung ke aplikasi YouTube / Browser
   Future<void> _launchYouTubeApp(BuildContext context) async {
     final videoId = video.id;
     final Uri url = Uri.parse('https://www.youtube.com/watch?v=$videoId');
@@ -23,14 +23,23 @@ class DetailPlayerPage extends StatelessWidget {
     }
   }
 
+  void _goToChannel(BuildContext context) {
+    if (video.channel != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ChannelDetailPages(channel: video.channel!),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final videoId = video.id;
-    // Mengambil gambar thumbnail resolusi tinggi langsung dari server YouTube berdasarkan ID Video
     final thumbnailUrl = 'https://img.youtube.com/vi/$videoId/maxresdefault.jpg';
 
     return Scaffold(
-      // Mencegah error perhitungan layar negatif saat resize browser Web
       resizeToAvoidBottomInset: false, 
       appBar: AppBar(
         title: Text(video.channel?.name ?? 'Detail Streaming'),
@@ -39,14 +48,11 @@ class DetailPlayerPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- BAGIAN GAMBAR THUMBNAIL (PENGGANTI PLAYER) ---
             AspectRatio(
               aspectRatio: 16 / 9,
               child: Image.network(
                 thumbnailUrl,
                 fit: BoxFit.cover,
-                // Jika gambar resolusi maksimal (maxresdefault) tidak tersedia, 
-                // otomatis pindah mengambil resolusi standar (hqdefault) agar tidak blank
                 errorBuilder: (context, error, stackTrace) {
                   return Image.network(
                     'https://img.youtube.com/vi/$videoId/hqdefault.jpg',
@@ -56,7 +62,6 @@ class DetailPlayerPage extends StatelessWidget {
               ),
             ),
             
-            // --- BAGIAN DETAIL INFORMASI & TOMBOL ---
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -69,7 +74,35 @@ class DetailPlayerPage extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 16),
+                  
+                  // --- PROFIL CHANNEL BISA DIKLIK ---
+                  InkWell(
+                    onTap: () => _goToChannel(context),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 20,
+                            backgroundImage: NetworkImage(video.channel?.photo ?? ''),
+                            onBackgroundImageError: (_, __) => const Icon(Icons.person),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              video.channel?.name ?? 'Unknown Channel',
+                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          const Icon(Icons.chevron_right, color: Colors.grey),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const Divider(height: 24),
+
                   Row(
                     children: [
                       const Icon(Icons.radio_button_checked, color: Colors.red, size: 16),
@@ -86,7 +119,6 @@ class DetailPlayerPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 32),
                   
-                  // --- TOMBOL UTAMA UNTUK NONTON KE YT ---
                   SizedBox(
                     width: double.infinity,
                     height: 50,

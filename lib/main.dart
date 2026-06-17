@@ -1,22 +1,29 @@
 import 'package:first/data/notifiers.dart';
 import 'package:first/views/pages/welcome_pages.dart';
+// 1. Pastikan import halaman Home kamu (sesuaikan path-nya jika beda)
+import 'package:first/views/widget_tree.dart'; 
 import 'package:flutter/material.dart';
-// 1. Tambahkan import dotenv di sini
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+// 2. Import shared_preferences
+import 'package:shared_preferences/shared_preferences.dart';
 
-// 2. Ubah void main() menjadi Future<void> main() async
 Future<void> main() async {
-  // 3. Wajib tambahkan ini agar engine Flutter siap
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // 4. Perintah untuk me-load file .env sebelum aplikasi berjalan
   await dotenv.load(fileName: "assets/.env");
 
-  runApp(const Home());
+  // 3. Cek status login sebelum aplikasi merender UI
+  final prefs = await SharedPreferences.getInstance();
+  final bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+
+  // 4. Kirim status login ke class Home
+  runApp(Home(isLoggedIn: isLoggedIn));
 }
 
 class Home extends StatefulWidget {
-  const Home({super.key});
+  // 5. Tangkap variabel status login dari main()
+  final bool isLoggedIn;
+  
+  const Home({super.key, required this.isLoggedIn});
 
   @override
   State<Home> createState() => _HomeState();
@@ -36,7 +43,10 @@ class _HomeState extends State<Home> {
               brightness: dark ? Brightness.light : Brightness.dark,
             ),
           ),
-          home: WelcomePages(),
+          // 6. Logika penentuan halaman: 
+          // Jika true -> langsung ke HomePages (misal: MyHome)
+          // Jika false -> pergi ke WelcomePages (nanti dari Welcome baru diarahkan ke Login)
+          home: widget.isLoggedIn ? WidgetTree() : WelcomePages(),
         );
       },
     );
