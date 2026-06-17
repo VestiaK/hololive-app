@@ -1,146 +1,144 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+// Sesuaikan import ini dengan struktur folder kamu
+import 'package:first/data/notifiers.dart'; 
 
-import '../../data/notifiers.dart';
+class Settings extends StatelessWidget {
+  const Settings({super.key});
 
-class Settings extends StatefulWidget {
-  const Settings({super.key, required this.title, });
+  // Fungsi untuk membuka browser sistem ketika teks API diklik
+  Future<void> _launchURL() async {
+    final Uri url = Uri.parse('https://holodex.net');
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      debugPrint('Tidak dapat membuka $url');
+    }
+  }
 
+  // Fungsi untuk memunculkan Popup (Dialog) Informasi
+  void _showAboutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Row(
+            children: [
+              Icon(Icons.info_outline, color: Colors.blueAccent),
+              SizedBox(width: 10),
+              Text('Informasi & Kredit'),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Hololive Stream App',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
+              const SizedBox(height: 5),
+              // Versi ini diambil dari pubspec.yaml kamu (1.0.0+1)
+              const Text('Versi 1.0.0'), 
+              const Divider(height: 20, thickness: 1),
+              const Text(
+                'Aplikasi ini dibuat sebagai proyek portofolio pengembangan antarmuka seluler. Seluruh aset gambar dan video adalah milik agensi VTuber terkait.',
+                style: TextStyle(fontSize: 14),
+              ),
+              const SizedBox(height: 15),
+              const Text(
+                'Data Provider:',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              ),
+              const SizedBox(height: 5),
+              // Teks yang bisa diklik untuk membuka URL
+              InkWell(
+                onTap: _launchURL,
+                child: const Text(
+                  'Powered by Holodex API',
+                  style: TextStyle(
+                    color: Colors.blueAccent,
+                    decoration: TextDecoration.underline,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                'Tutup',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
-final String title;
-  @override
-  State<Settings> createState() => _SettingsState();
-}
-
-class _SettingsState extends State<Settings> {
-  TextEditingController controller = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
-
-        leading: BackButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        automaticallyImplyLeading: false),
-
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsetsGeometry.all(20.0),
-          child: Column(
-            children: [
-              TextField(
-                controller: controller,
-                decoration: InputDecoration(border: OutlineInputBorder()),
-                onEditingComplete: () {
-                  setState(() {});
-                },
+        title: const Text('Pengaturan'),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16.0),
+        children: [
+          // --- Kategori: Tampilan ---
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+            child: Text(
+              'Tampilan',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
               ),
-              Text(controller.text),
-              ValueListenableBuilder(
-                valueListenable: isChecked,
-                builder: (context, a, child) {
-                  return Checkbox(
-                    value: a,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        isChecked.value = value;
-                      });
-                    },
-                  );
-                },
-              ),
-              ValueListenableBuilder(
-                valueListenable: isChecked,
-                builder: (context, a, child) {
-                  return CheckboxListTile(
-                    title: Text('aku kpop'),
-                    value: a,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        isChecked.value = value;
-                      });
-                    },
-                  );
-                },
-              ),
-              ValueListenableBuilder(
-                valueListenable: isSwitch,
-                builder: (context, b, child) {
-                  return Switch(
-                    value: b,
-                    onChanged: (bool value) {
-                      setState(() {
-                        isSwitch.value = value;
-                      });
-                    },
-                  );
-                },
-              ),
-              ValueListenableBuilder(
-                valueListenable: isSwitch,
-                builder: (context, b, child) {
-                  return SwitchListTile(
-                    title: Text('aku wibu'),
-                    value: b,
-                    onChanged: (bool value) {
-                      setState(() {
-                        isSwitch.value = value;
-                      });
-                    },
-                  );
-                },
-              ),
-              ValueListenableBuilder(
-                valueListenable: isSlider,
-                builder: (context, a, child) {
-                  return Slider(
-                    max: 10,
-                    divisions: 10,
-                    value: a,
-                    onChanged: (double value) {
-                      setState(() {
-                        isSlider.value = value;
-                      });
-                    },
-                  );
-                },
-              ),
-              InkWell(
-                onTap: () {},
-                child: Container(
-                  height: 50,
-                  width: double.infinity,
-                  color: Colors.black38,
-                ),
-              ),
-              ElevatedButton(onPressed: () {
-                showDialog(context: context, builder: (context) {
-                    return AboutDialog();
-                  },);
-              }, child: Text('about'),),
-              Divider(
-                color: Colors.greenAccent,
-                thickness: 5.0,
-                endIndent: 100,
-              ),
-              ElevatedButton(onPressed: () {
-                showDialog(context: context, builder: (context) {
-                    return AlertDialog(
-                    title: Text('awasss'),
-                    content: Text('kontol'),
-                    actions: [
-                      FilledButton(onPressed: () {
-                        Navigator.pop(context);
-                      }, child: Text('Close'))
-                    ],);
-                  },);
-              }, child: Text('alert'))
-            ],
+            ),
           ),
-        ),
+          // Menggunakan ValueListenableBuilder untuk update real-time Dark Mode
+          ValueListenableBuilder(
+            valueListenable: darkmode,
+            builder: (context, isDark, child) {
+              return ListTile(
+                leading: Icon(isDark ? Icons.dark_mode : Icons.light_mode),
+                title: const Text('Mode Gelap'),
+                trailing: Switch(
+                  value: isDark,
+                  onChanged: (value) {
+                    darkmode.value = value;
+                  },
+                ),
+              );
+            },
+          ),
+          const Divider(),
+
+          // --- Kategori: Tentang Aplikasi ---
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+            child: Text(
+              'Tentang',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.code),
+            title: const Text('Informasi API & Kredit'),
+            subtitle: const Text('Versi, Atribusi Data, & Keterangan Proyek'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => _showAboutDialog(context), // Memanggil Dialog saat diklik
+          ),
+        ],
       ),
     );
   }

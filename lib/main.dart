@@ -39,7 +39,7 @@ class _HomeState extends State<Home> {
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(
-              seedColor: Colors.greenAccent,
+              seedColor:Colors.lightBlue,
               brightness: dark ? Brightness.light : Brightness.dark,
             ),
           ),

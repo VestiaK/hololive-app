@@ -25,69 +25,52 @@ class _MyHomeState extends State<MyHome> {
   Timer? _debounce;
   String _searchQuery = '';
 
+  int _currentPage = 1;
+  final int _itemsPerPage = 50; // HARUS 50, SESUAIKAN DENGAN LIMIT API 
+  bool _hasMore = true;
 
-  final ScrollController _scrollController = ScrollController();
-  int _currentOffset = 0;
-  bool _isFetchingMore = false; 
-  bool _hasMore = true; 
+  bool _isSearching = false;
 
   @override
   void initState() {
     super.initState();
     _fetchData(); 
-    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
     _searchController.dispose();
     _debounce?.cancel();
-    _scrollController.dispose(); 
     super.dispose();
-  }
-
-
-  void _onScroll() {
-
-    if (_scrollController.position.maxScrollExtent > 0) {
-      if (_scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent - 200) {
-        if (!_isLoading && !_isFetchingMore && _hasMore) {
-          _fetchMoreData();
-        }
-      }
-    }
   }
 
   Future<void> _fetchData() async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
-      _currentOffset = 0; 
-      _hasMore = true;
       _allLiveVideos = []; 
     });
 
     try {
+      int offset = (_currentPage - 1) * _itemsPerPage;
       List<VideoFull> videos;
+
       if (_selectedStatus == 'Live') {
         videos = await _holodexService.fetchLiveVideos(
           org: _selectedOrg,
-          offset: _currentOffset,
+          offset: offset,
         );
       } else {
         videos = await _holodexService.fetchUploadedVideos(
           org: _selectedOrg,
-          offset: _currentOffset,
+          offset: offset,
         );
       }
 
       setState(() {
-        _allLiveVideos = videos
-            .toList(); 
-
+        _allLiveVideos = videos;
         _isLoading = false;
-        if (videos.length < 10) _hasMore = false;
+        _hasMore = videos.length == _itemsPerPage;
       });
     } catch (e) {
       setState(() {
@@ -97,43 +80,21 @@ class _MyHomeState extends State<MyHome> {
     }
   }
 
-
-  Future<void> _fetchMoreData() async {
-    setState(() {
-      _isFetchingMore = true;
-      _currentOffset += 10; 
-    });
-
-    try {
-      List<VideoFull> videos;
-      if (_selectedStatus == 'Live') {
-        videos = await _holodexService.fetchLiveVideos(
-          org: _selectedOrg,
-          offset: _currentOffset,
-        );
-      } else {
-        videos = await _holodexService.fetchUploadedVideos(
-          org: _selectedOrg,
-          offset: _currentOffset,
-        );
-      }
-
+  void _nextPage() {
+    if (_hasMore && !_isLoading) {
       setState(() {
-  
-        final newVideos = videos.where((v) => !_allLiveVideos.any((existing) => existing.id == v.id)).toList();
-        
-        _allLiveVideos.addAll(newVideos); 
-        _isFetchingMore = false;
-      
-        if (videos.length < 10 || newVideos.isEmpty) {
-          _hasMore = false; 
-        }
+        _currentPage++;
       });
-    } catch (e) {
+      _fetchData();
+    }
+  }
+
+  void _prevPage() {
+    if (_currentPage > 1 && !_isLoading) {
       setState(() {
-        _isFetchingMore = false;
-        _hasMore = false; 
+        _currentPage--;
       });
+      _fetchData();
     }
   }
 
@@ -143,10 +104,13 @@ class _MyHomeState extends State<MyHome> {
     _debounce = Timer(const Duration(milliseconds: 500), () {
       setState(() {
         _searchQuery = query.toLowerCase();
+        _currentPage = 1; 
       });
+      _fetchData();
     });
   }
 
+  // Filter Lokal Dikembalikan: Menyaring 50 data yang diambil menggunakan teks channel
   List<VideoFull> get _filteredVideos {
     return _allLiveVideos.where((video) {
       final channelName = video.channel?.name?.toUpperCase() ?? '';
@@ -243,36 +207,11 @@ class _MyHomeState extends State<MyHome> {
                   Wrap(
                     spacing: 8.0,
                     children: [
-                      _buildOrgChip(
-                        'All',
-                        null,
-                        tempOrg,
-                        (org) => setModalState(() => tempOrg = org),
-                      ),
-                      _buildOrgChip(
-                        'Hololive',
-                        Organization.Hololive,
-                        tempOrg,
-                        (org) => setModalState(() => tempOrg = org),
-                      ),
-                      _buildOrgChip(
-                        'Nijisanji',
-                        Organization.Nijisanji,
-                        tempOrg,
-                        (org) => setModalState(() => tempOrg = org),
-                      ),
-                      _buildOrgChip(
-                        'VShojo',
-                        Organization.VShojo,
-                        tempOrg,
-                        (org) => setModalState(() => tempOrg = org),
-                      ),
-                      _buildOrgChip(
-                        'Indie',
-                        Organization.Independents,
-                        tempOrg,
-                        (org) => setModalState(() => tempOrg = org),
-                      ),
+                      _buildOrgChip('All', null, tempOrg, (org) => setModalState(() => tempOrg = org)),
+                      _buildOrgChip('Hololive', Organization.Hololive, tempOrg, (org) => setModalState(() => tempOrg = org)),
+                      _buildOrgChip('Nijisanji', Organization.Nijisanji, tempOrg, (org) => setModalState(() => tempOrg = org)),
+                      _buildOrgChip('VShojo', Organization.VShojo, tempOrg, (org) => setModalState(() => tempOrg = org)),
+                      _buildOrgChip('Indie', Organization.Independents, tempOrg, (org) => setModalState(() => tempOrg = org)),
                     ],
                   ),
                   const SizedBox(height: 24),
@@ -284,19 +223,14 @@ class _MyHomeState extends State<MyHome> {
                       onPressed: () {
                         Navigator.pop(context);
 
-                        bool requiresApiCall =
-                            (_selectedOrg != tempOrg) ||
-                            (_selectedStatus != tempStatus);
-
                         setState(() {
                           _selectedLang = tempLang;
                           _selectedOrg = tempOrg;
                           _selectedStatus = tempStatus;
+                          _currentPage = 1; 
                         });
 
-                        if (requiresApiCall) {
-                          _fetchData();
-                        }
+                        _fetchData();
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.redAccent,
@@ -319,12 +253,7 @@ class _MyHomeState extends State<MyHome> {
     );
   }
 
-  Widget _buildOrgChip(
-    String label,
-    Organization? org,
-    Organization? currentSelected,
-    Function(Organization?) onSelect,
-  ) {
+  Widget _buildOrgChip(String label, Organization? org, Organization? currentSelected, Function(Organization?) onSelect) {
     return ChoiceChip(
       label: Text(label),
       selected: currentSelected == org,
@@ -338,46 +267,37 @@ class _MyHomeState extends State<MyHome> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_selectedStatus == 'Live' ? 'Live Now' : 'Uploaded Videos'),
+        title: _isSearching
+            ? TextField(
+                controller: _searchController,
+                onChanged: _onSearchChanged,
+                autofocus: true,
+                style: const TextStyle(fontSize: 18),
+                decoration: const InputDecoration(
+                  hintText: 'Cari nama VTuber atau judul...',
+                  border: InputBorder.none,
+                ),
+              )
+            : Text(_selectedStatus == 'Live' ? 'Live Now' : 'Uploaded Videos'),
         actions: [
+          IconButton(
+            icon: Icon(_isSearching ? Icons.close : Icons.search),
+            onPressed: () {
+              setState(() {
+                if (_isSearching) {
+                  _isSearching = false;
+                  _searchController.clear();
+                  _onSearchChanged(''); 
+                } else {
+                  _isSearching = true;
+                }
+              });
+            },
+          ),
           IconButton(icon: const Icon(Icons.tune), onPressed: _showFilterModal),
         ],
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 8.0,
-            ),
-            child: TextField(
-              controller: _searchController,
-              onChanged: _onSearchChanged,
-              decoration: InputDecoration(
-                hintText: 'Cari nama VTuber atau judul...',
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: _searchQuery.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          _searchController.clear();
-                          _onSearchChanged('');
-                        },
-                      )
-                    : null,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: Theme.of(context).cardColor,
-              ),
-            ),
-          ),
-
-          Expanded(child: _buildBody()),
-        ],
-      ),
+      body: _buildBody(),
     );
   }
 
@@ -394,35 +314,67 @@ class _MyHomeState extends State<MyHome> {
     }
 
     final displayList = _filteredVideos;
+    
     if (displayList.isEmpty) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.all(20.0),
-          child: Text(
-            'Tidak ada video yang cocok dengan pencarian atau filtermu.',
-            textAlign: TextAlign.center,
+      return ListView(
+        children: [
+          const SizedBox(height: 60),
+          const Center(
+            child: Padding(
+              padding: EdgeInsets.all(20.0),
+              child: Text(
+                'Tidak ada video ditemukan di halaman ini.',
+                textAlign: TextAlign.center,
+              ),
+            ),
           ),
-        ),
+          const SizedBox(height: 20),
+          _buildPaginationControls(), 
+        ],
       );
     }
 
     return ListView.builder(
-
-      controller: _scrollController,
-
-      itemCount: displayList.length + (_isFetchingMore ? 1 : 0),
+      itemCount: displayList.length + 1, 
       itemBuilder: (context, index) {
-
         if (index == displayList.length) {
-          return const Padding(
-            padding: EdgeInsets.symmetric(vertical: 20.0),
-            child: Center(
-              child: CircularProgressIndicator(color: Colors.redAccent),
-            ),
-          );
+          return _buildPaginationControls();
         }
         return CardWidget(video: displayList[index]);
       },
+    );
+  }
+
+  Widget _buildPaginationControls() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ElevatedButton(
+            onPressed: _currentPage > 1 ? _prevPage : null,
+            style: ElevatedButton.styleFrom(
+              shape: const CircleBorder(),
+              padding: const EdgeInsets.all(12),
+            ),
+            child: const Icon(Icons.arrow_back),
+          ),
+          const SizedBox(width: 16),
+          Text(
+            'Halaman $_currentPage',
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+          const SizedBox(width: 16),
+          ElevatedButton(
+            onPressed: _hasMore ? _nextPage : null,
+            style: ElevatedButton.styleFrom(
+              shape: const CircleBorder(),
+              padding: const EdgeInsets.all(12),
+            ),
+            child: const Icon(Icons.arrow_forward),
+          ),
+        ],
+      ),
     );
   }
 }

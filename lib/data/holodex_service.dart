@@ -6,8 +6,10 @@ class HolodexService {
     apiKey: dotenv.env['HOLODEX_API_KEY'] ?? '',
   );
 
-
-  Future<List<VideoFull>> fetchLiveVideos({Organization? org, int offset = 0}) async {
+  Future<List<VideoFull>> fetchLiveVideos({
+    Organization? org, 
+    int offset = 0,
+  }) async {
     try {
       final response = await client.getLiveVideos(
         VideoFilter(
@@ -15,7 +17,7 @@ class HolodexService {
           status: [VideoStatus.live], 
           type: VideoType.stream,
           includes: [Includes.liveInfo],
-          limit: 20, 
+          limit: 50, // KUNCI SOLUSI: Ambil 50 data maksimal dari API sekaligus
           offset: offset, 
         ),
       );
@@ -25,8 +27,10 @@ class HolodexService {
     }
   }
 
-
-  Future<List<VideoFull>> fetchUploadedVideos({Organization? org, int offset = 0}) async {
+  Future<List<VideoFull>> fetchUploadedVideos({
+    Organization? org, 
+    int offset = 0,
+  }) async {
     try {
       final response = await client.getVideos( 
         VideoFilter(
@@ -34,7 +38,7 @@ class HolodexService {
           status: [VideoStatus.past], 
           type: VideoType.stream,
           includes: [Includes.liveInfo],
-          limit: 10,
+          limit: 50, // KUNCI SOLUSI: Ambil 50 data maksimal
           offset: offset, 
         ),
       );

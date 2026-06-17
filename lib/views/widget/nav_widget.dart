@@ -11,7 +11,7 @@ class NavWidget extends StatelessWidget {
       builder: (context, cu, child) {
         return NavigationBar(
           destinations: [
-            NavigationDestination(icon: Icon(Icons.home_mini), label: 'home'),
+            NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
             NavigationDestination(icon: Icon(Icons.person_3), label: 'Profile'),
           ],
           onDestinationSelected: (int value) {

@@ -15,7 +15,7 @@ class WidgetTree extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Flutter Map'),
+        title: Text('Vtuber App'),
         actions: [
           IconButton(
             onPressed: () {
@@ -35,7 +35,7 @@ class WidgetTree extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) {
                     return Settings(
-                      title: 'Settingss',
+                      
                     );
                   },
                 ),

@@ -63,7 +63,7 @@ class _LoginPagesState extends State<LoginPages> {
             const Icon(Icons.ondemand_video, size: 80, color: Colors.blue),
             const SizedBox(height: 16),
             const Text(
-              'VTuber Directory', 
+              'Login to Your Account', 
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)
             ),
             const SizedBox(height: 32),

@@ -17,10 +17,10 @@ class WelcomePages extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Lottie.asset('lotties/c.json'),
+                Lottie.asset('lotties/a.json'),
                 FittedBox(
                   child: Text(
-                    'Welcome to the app!',
+                    'Vtuber App',
                     style: TextStyle(fontSize: 100, fontWeight: FontWeight.bold, letterSpacing: 30.0),
                   ),
                 ),

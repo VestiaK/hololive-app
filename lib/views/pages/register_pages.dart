@@ -50,7 +50,7 @@ class _RegisterPagesState extends State<RegisterPages> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.person_add, size: 80, color: Colors.red),
+            const Icon(Icons.person_add, size: 80, color: Colors.lightBlue),
             const SizedBox(height: 24),
             TextField(
               controller: _usernameController,
@@ -76,7 +76,7 @@ class _RegisterPagesState extends State<RegisterPages> {
               height: 50,
               child: ElevatedButton(
                 onPressed: _registerProcess,
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.lightBlue),
                 child: const Text(
                   'Daftar Akun', 
                   style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)
