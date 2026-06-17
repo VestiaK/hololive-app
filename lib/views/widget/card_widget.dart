@@ -1,3 +1,4 @@
+import 'package:first/views/pages/detail_player_page.dart';
 import 'package:flutter/material.dart';
 // 1. Pastikan import holodex ada di sini
 import 'package:dart_holodex_api/dart_holodex_api.dart'; 
@@ -10,18 +11,29 @@ class CardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Column(
-        children: [
-          Image.network(
-            'https://i.ytimg.com/vi/${video.id}/hqdefault.jpg',
-            fit: BoxFit.cover,
-          ),
-          ListTile(
-            title: Text(video.title ?? 'No Title'),
-            subtitle: Text(video.channel?.name ?? 'Unknown Channel'),
-          ),
-        ],
+    return InkWell(
+      onTap: () {
+      // Navigasi masuk ke halaman player bawaan aplikasi
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DetailPlayerPage(video: video),
+        ),
+      );
+    },
+      child: Card(
+        child: Column(
+          children: [
+            Image.network(
+              'https://i.ytimg.com/vi/${video.id}/hqdefault.jpg',
+              fit: BoxFit.cover,
+            ),
+            ListTile(
+              title: Text(video.title ?? 'No Title'),
+              subtitle: Text(video.channel?.name ?? 'Unknown Channel'),
+            ),
+          ],
+        ),
       ),
     );
   }

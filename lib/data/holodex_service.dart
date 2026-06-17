@@ -6,11 +6,18 @@ class HolodexService {
     apiKey: dotenv.env['HOLODEX_API_KEY'] ?? '',
   );
 
-  // Tipe kembalian sudah diubah menjadi List<VideoFull>
-  Future<List<VideoFull>> fetchLiveVideos() async {
+  // Ubah Organization menjadi nullable (Organization?)
+  Future<List<VideoFull>> fetchLiveVideos({Organization? org}) async {
     try {
-      final response = await client.getLiveVideos();
-      // Mengembalikan properti items yang sudah berupa List<VideoFull>
+      final response = await client.getLiveVideos(
+        VideoFilter(
+          organization: org, // Jika null, otomatis mengambil ALL Agency
+          status: [VideoStatus.live], 
+          type: VideoType.stream,
+          includes: [Includes.liveInfo],
+          limit: 50,
+        ),
+      );
       return response.items; 
     } catch (e) {
       throw Exception('Gagal mengambil data live: $e');
